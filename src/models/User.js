@@ -1,48 +1,60 @@
 
 import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto'
 
 const userSchema = mongoose.Schema(
   {
     first_name: {
       type: String,
-      required: true,
+      required: [true,'Please tell us your first name'],
     },
     last_name:{
       type: String,
-      required: true
+      required: [true,'Please tell us your last name']
     },
     email: {
       type: String,
-      required: true,
+      required: [true,'Please provide your email'],
       unique: true,
     },
     password: {
       type: String,
-      required: true,
+      required: [true,'Please provide your password'],
+      minLength: 8
+    },
+    passwordConfirm:{
+      type:String,
+      required:[true, 'Please confirm your password']
     },
     role: {
       type: String,
       enum: ['admin','moderator','user'],
     },
-  },
+    passwordResetToken:{
+      type: String
+    },
+    passwordResetExpires:{
+      type: Date
+    },
+    passwordUpdatedAt:{
+      type: Date
+    }
+  }, 
   {
     timestamps: true,
   }
 )
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password)
-}
+// userSchema.methods.createPasswordResetToken = () => {
+//   const resetToken = crypto.randomBytes(32).toString('hex');
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    next()
-  }
+//   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-  const salt = await bcrypt.genSalt(10)
-  this.password = await bcrypt.hash(this.password, salt)
-})
+//   this.passwordResetExpires = Date.now() + 10*60*1000 ;
+
+//   return resetToken;
+// }
 
 const User = mongoose.model('User', userSchema)
 

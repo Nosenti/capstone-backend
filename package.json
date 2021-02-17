@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "start": "node src/index",
     "dev": "nodemon --exec babel-node src/index"
@@ -33,9 +33,15 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
+    "express-mongo-sanitize": "^2.0.2",
+    "express-rate-limit": "^5.2.5",
+    "helmet": "^4.4.1",
+    "hpp": "^0.2.3",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.12",
-    "path": "^0.12.7"
+    "nodemailer": "^6.4.17",
+    "path": "^0.12.7",
+    "xss-clean": "^0.1.1"
   }
 }

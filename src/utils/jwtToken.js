@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from 'dotenv';
+import crypto from 'crypto';
 
 config();
 export const jwtToken = {
   createToken({
-    id, email, firstName, lastName, role, manager_id
+    id
   }) {
     return jwt.sign({
-      id, email, firstName, lastName, role, manager_id
+      id
     },
     process.env.SECRET_OR_KEY, { expiresIn: '24h' });
   },
@@ -18,5 +19,10 @@ export function verifyingToken(token) {
   return verifiedToken;
 }
 
-export const hashPassowrd = (password) => bcrypt.hashSync(password, 10);
-export const comparePassword = (password, hash) => bcrypt.compareSync(password, hash);
+export const hashPassword = (password) => bcrypt.hashSync(password, 10);
+export const  comparePassword = (password, hash) => bcrypt.compareSync(password, hash);
+
+export function createPasswordResetToken(){
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  return resetToken;
+}
