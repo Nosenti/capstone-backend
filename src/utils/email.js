@@ -1,25 +1,53 @@
 import nodemailer from 'nodemailer';
+import {htmlToText} from 'html-to-text';
 
-const sendEmail = async (options) => {
-  // 1) create a transporter
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
+
+
+export default class Email{
+  constructor(user, url){
+    this.to = user.email;
+    this.first_name = user.first_name;
+    this.url = url;
+    this.from = `Innocent Ingabire <${process.env.EMAIL_FROM}>`
+  }
+
+  newTransport(){
+
+    return nodemailer.createTransport({
+    host: process.env.EMAIL_PROD_HOST,
+    port: process.env.EMAIL_PROD__PORT,
+    secure: false,
     auth:{
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD
+      user: process.env.EMAIL_PROD_USERNAME,
+      pass: process.env.EMAIL_PROD_PASSWORD
     }
     // Activate in gmail *less secure app* option
   })
-  // 2) Define the email options
-  const mailOptions = {
-    from: 'Innocent Ingabire <inno100os@gmail.com>',
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
   }
-  // 3) Actually send the email
-  await transporter.sendMail(mailOptions)
+// send the actual email
+  async send(message, subject){
+    // 1) Render HTML
+    const html = message;
+    // 2) Define email options
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject,
+      html,
+      // text: htmlToText.fromString(html)
+    }
+    //3) Create a transport and send email 
+    await this.newTransport().sendMail(mailOptions)
+  }
+  async sendWelcome(){
+    await this.send(`<p>Hello ${this.first_name}</p></br>
+    Welcome to my website`,`Welcome to the Platform`)
+  }
+  async sendPasswordReset(){
+    await this.send(`<p>Hello ${this.first_name}</p></br>
+    Reset URL: ${this.url}`,`Your password Reset token (Valid for only 10 mins)`)
+  }
 }
 
-export default sendEmail
+// new Email(user, url).sendWelcome();
+

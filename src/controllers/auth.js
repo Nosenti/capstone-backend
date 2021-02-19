@@ -2,7 +2,7 @@
 import User from '../models/User.js';
 import crypto from 'crypto';
 import { hashPassword, comparePassword, jwtToken, createPasswordResetToken } from '../utils/jwtToken.js';
-import sendEmail from '../utils/email.js';
+import Email from '../utils/email.js';
 
 export default class Auth {
 
@@ -30,6 +30,10 @@ export default class Auth {
         passwordConfirm: hashPassword(passwordConfirm),
         role:'user'
       });
+      const url = `${req.protocol}://${req.get('host')}/me`;
+      console.log(url);
+      await new Email(user, url).sendWelcome();
+
       const token = jwtToken.createToken(user);
       return res.status(201).send({
         token,
@@ -60,17 +64,11 @@ export default class Auth {
       user.passwordResetExpires = Date.now() + 10*60*1000;
       await user.save() 
 
-      const resetURL = `${req.protocol}://${req.get('host')}/api/users/resetPassword/${resetToken}`
-
-      const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}. \nIf you didn't forget your password, please ignore this email`;
-      
       try {
-        await sendEmail({
-          email: user.email,
-          subject: ' Your password reset token {valid for 10 mins}',
-          message
-        })
 
+        const resetURL = `${req.protocol}://${req.get('host')}/api/users/resetPassword/${resetToken}`;
+
+        await new Email(user, resetURL).sendPasswordReset()
         res.status(200).send({
           status: 200,
           message: ' Token sent to the email'
@@ -124,7 +122,8 @@ export default class Auth {
       }); 
     } catch (error) {
       console.log(error)
-      return res.status(500).send(error);
+      return res.status(500).send({
+        error: error});
     }
   }
 

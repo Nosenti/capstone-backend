@@ -9,8 +9,8 @@ router.use(express.json());
 router.get('/',(req,res)=>{
   res.status(200).send('Welcome to ALUxFeed')
 })
-router.post('/signup',authController.signup)
-router.post('/signin',authController.signin)
+router.post('/users/signup',authController.signup)
+router.post('/users/signin',authController.signin)
 
 router.post('/users/forgotPassword',authController.forgotPassword)
 router.patch('/users/resetPassword/:token',authController.resetPassword)
