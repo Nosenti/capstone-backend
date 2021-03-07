@@ -15,11 +15,25 @@ export default class Auth {
         password,
         passwordConfirm
       } = req.body;
+
+      // if (!((/@alustudent.com\s*$/.test(email))||(/@alueducation.com\s*$/.test(email)))) {
+      //   return res.status(400).send({
+      //     status: 400,
+      //     message: 'You should signup with ALU email'
+      //   })
+      // }
       const existUser = await User.findOne({ email });
       if (existUser) {
         return res.status(409).json({
           message: 'user already exists'
         });
+      }
+      
+      if( passwordConfirm !== password){
+        return res.status(400).send({
+          status: 400,
+          message:"Password and confirm password do not match"
+        })
       }
       const hash = hashPassword(password);
       const user = await User.create({
@@ -27,18 +41,18 @@ export default class Auth {
         last_name,
         email,
         password:hash,
-        passwordConfirm: hashPassword(passwordConfirm),
         role:'user'
       });
-      const url = `${req.protocol}://${req.get('host')}/me`;
-      console.log(url);
-      await new Email(user, url).sendWelcome();
-
       const token = jwtToken.createToken(user);
-      return res.status(201).send({
-        token,
-        message:'The user is created'
-      });
+      user.verifyToken = token;
+      user.save();
+      const url = `${req.protocol}://${req.get('host')}/api/users/confirmEmail/${token}`;
+      await new Email(user, url).sendConfirmEmail();
+      return res.status(200).send({
+        status: 200,
+        message: 'Confirm your email address'
+      })
+      
     } catch (error) {
       console.log(error)
       return res.status(500).send({
@@ -132,6 +146,12 @@ export default class Auth {
       const { email, password } = req.body;
       const user = await User.findOne({email});
       if (!user) return res.status(400).send({ status: 400, error: "User doesn't exist" });
+      if(user.isVerified === false){
+        return res.status(400).send({
+          status: 400,
+          message: 'Confirm your email first'
+        })
+      }
       if (user && comparePassword(password, user.password)) {
         const token = jwtToken.createToken(user);
         return res.status(200).send({ token });
@@ -168,6 +188,69 @@ export default class Auth {
       return res.status(201).send({
         token,
         message:'Password is updated'
+      }); 
+
+
+    } catch (error) {
+      console.log(error)
+      return res.status(500).send(error);
+    }
+  }
+
+  static async resetPassword(req, res) {
+    try {
+      // 1) Get user based on the token
+      const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+      const user = await User.findOne({passwordResetToken: hashedToken, passwordResetExpires:{$gt:Date.now()}});
+
+       
+      // 2) if token has not expired and there is user, set the new password
+      if(!user){
+        return res.status(400).send({
+          status: 400,
+          message: 'Token is invalid or has expired'
+        })
+      }
+      user.password = hashPassword(req.body.password);
+      user.passwordConfirm = hashPassword(req.body.passwordConfirm),
+      user.passwordResetToken= undefined,
+      user.passwordResetExpires = undefined;
+      user.passwordUpdatedAt = Date.now() - 1000;
+      await user.save();
+
+      // 3) update changedPasswordAt property for the user
+
+      // Log the user in, send JWT
+      const token = jwtToken.createToken(user);
+      return res.status(200).send({
+        token,
+        message:'The user is logged in'
+      }); 
+    } catch (error) {
+      console.log(error)
+      return res.status(500).send({
+        error: error});
+    }
+  }
+
+  static async confirmEmail(req, res) {
+    try {
+      
+      const providedToken = req.params.token;
+      const user = await User.findOne({verifyToken: providedToken})
+
+      if(!user){
+        return res.status(400).send({
+          status: 400,
+          message: 'Token is invalid or expired'
+        })
+      }
+
+      user.isVerified = true;
+      user.save();
+      return res.status(201).send({
+        message:'Email Confirmed. You can now login'
       }); 
 
 

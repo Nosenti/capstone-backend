@@ -33,7 +33,7 @@ app.use(fileupload({
   useTempFiles: true
 }));
 
-// Limit requests from teh same API
+// Limit requests from teh same IP Address
 const limiter = rateLimit({
   max: 100,
   windowMs: 60*60*1000,

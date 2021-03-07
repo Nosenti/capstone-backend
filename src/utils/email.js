@@ -39,9 +39,9 @@ export default class Email{
     //3) Create a transport and send email 
     await this.newTransport().sendMail(mailOptions)
   }
-  async sendWelcome(){
+  async sendConfirmEmail(){
     await this.send(`<p>Hello ${this.first_name}</p></br>
-    Welcome to my website`,`Welcome to the Platform`)
+    <a href=" ${this.url}">Confirm Email</a>`,`Welcome to the Platform`)
   }
   async sendPasswordReset(){
     await this.send(`<p>Hello ${this.first_name}</p></br>

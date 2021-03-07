@@ -23,13 +23,16 @@ const userSchema = mongoose.Schema(
       required: [true,'Please provide your password'],
       minLength: 8
     },
-    passwordConfirm:{
-      type:String,
-      required:[true, 'Please confirm your password']
-    },
     role: {
       type: String,
       enum: ['admin','moderator','user'],
+    },
+    isVerified:{
+      type: Boolean,
+      default: false
+    },
+    verifyToken:{
+      type: String
     },
     passwordResetToken:{
       type: String
@@ -45,16 +48,6 @@ const userSchema = mongoose.Schema(
     timestamps: true,
   }
 )
-
-// userSchema.methods.createPasswordResetToken = () => {
-//   const resetToken = crypto.randomBytes(32).toString('hex');
-
-//   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-
-//   this.passwordResetExpires = Date.now() + 10*60*1000 ;
-
-//   return resetToken;
-// }
 
 const User = mongoose.model('User', userSchema)
 
