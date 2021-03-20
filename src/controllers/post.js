@@ -105,7 +105,7 @@ class Post_ {
         post.save();
         res.status(200).send({
           status: 200,
-          message: 'Todo updated'
+          message: 'Post updated'
         })
       }else{
         res.status(403).send({
@@ -140,7 +140,7 @@ class Post_ {
         await post.remove();
          return res.status(200).send({
           status: 200,
-          message: 'Todo is deleted'
+          message: 'Post is deleted'
         })
       }else{
         res.status(403).send({

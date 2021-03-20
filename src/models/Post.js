@@ -6,12 +6,12 @@ const PostSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId
   },
+  title: {
+    type: String
+  },
   text: {
     type: String,
     required: true
-  },
-  title: {
-    type: String
   },
   avatar: {
     type: String
@@ -29,6 +29,9 @@ const PostSchema = new Schema({
   numDisagree:{
     type: Number
   },
+  numComments:{
+    type: Number
+  },
   disagree: [
     {
       user: {
@@ -37,7 +40,8 @@ const PostSchema = new Schema({
     }
   ],
   postedAnonymously:{
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   comments: [
     {
