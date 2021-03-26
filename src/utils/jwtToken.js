@@ -6,10 +6,10 @@ import crypto from 'crypto';
 config();
 export const jwtToken = {
   createToken({
-    id
+    id,role
   }) {
     return jwt.sign({
-      id
+      id,role
     },
     process.env.SECRET_OR_KEY, { expiresIn: '24h' });
   },

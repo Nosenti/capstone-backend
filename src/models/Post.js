@@ -2,6 +2,30 @@
 import mongoose from 'mongoose'
 const Schema = mongoose.Schema;
 
+const commentSchema = new Schema(
+   {
+      user: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref:'User'
+      },
+      text: {
+        type: String,
+        required: true
+      },
+      name: {
+        type: String
+      },
+      avatar: {
+        type: String
+      },
+      date: {
+        type: Date,
+        default: Date.now
+      }
+    }
+)
+
 const PostSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId
@@ -43,27 +67,15 @@ const PostSchema = new Schema({
     type: Boolean,
     default: false
   },
-  comments: [
-    {
-      user: {
-        type: Schema.Types.ObjectId
-      },
-      text: {
-        type: String,
-        required: true
-      },
-      name: {
-        type: String
-      },
-      avatar: {
-        type: String
-      },
-      date: {
-        type: Date,
-        default: Date.now
-      }
-    }
-  ],
+  approved:{
+    type: Boolean,
+    default: true
+  },
+  declined:{
+    type: Boolean,
+    default: false
+  },
+  comments: [ commentSchema ],
   date: {
     type: Date,
     default: Date.now

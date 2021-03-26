@@ -12,7 +12,9 @@ router.get('/',(req,res)=>{
 })
 router.post('/users/signup',authController.signup)
 router.post('/users/signin',authController.signin)
-
+/**
+ * User routes
+ */
 router.post('/users/forgotPassword',authController.forgotPassword)
 router.patch('/users/resetPassword/:token',authController.resetPassword)
 router.get('/users/confirmEmail/:token',authController.confirmEmail)
@@ -20,10 +22,26 @@ router.patch('/users/updatePassword', checkAuth.verifyUser, authController.updat
 router.patch('/users/updateMe', checkAuth.verifyUser, userController.updateMe)
 router.get('/users/getUsers', userController.getUsers)
 
+/**
+ * Post routes
+ */
 router.post('/posts', checkAuth.verifyUser, postController.createPost)
 router.get('/posts', checkAuth.verifyUser, postController.getPosts)
 router.get('/posts/:id', checkAuth.verifyUser, postController.getOnePost)
 router.patch('/posts/:id', checkAuth.verifyUser, postController.updatePost)
-router.delete('/posts/:id', checkAuth.verifyUser, postController.deletePost)
+router.delete('/posts/:id', checkAuth.verifyUser, postController.deletePost);
+router.patch('/posts/:id/moderatePost', checkAuth.verifyUser, postController.moderatePost);
+
+/**
+ * Comment routes
+ */
+router.post('/posts/:id/comment', checkAuth.verifyUser, postController.createComment)
+router.post('/posts/:id/comment/:commentId', checkAuth.verifyUser, postController.deleteComment)
+
+/**
+ * agree and disagree routes
+ */
+router.post('/posts/:id/agree', checkAuth.verifyUser, postController.agree)
+router.post('/posts/:id/disagree', checkAuth.verifyUser, postController.disagree)
 
 export default router;
