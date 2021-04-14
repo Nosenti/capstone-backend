@@ -6,7 +6,7 @@ import {htmlToText} from 'html-to-text';
 export default class Email{
   constructor(user, url){
     this.to = user.email;
-    this.first_name = user.first_name;
+    this.name = user.name;
     this.url = url;
     this.from = `Innocent Ingabire <${process.env.EMAIL_FROM}>`
   }
@@ -40,11 +40,11 @@ export default class Email{
     await this.newTransport().sendMail(mailOptions)
   }
   async sendConfirmEmail(){
-    await this.send(`<p>Hello ${this.first_name}</p></br>
+    await this.send(`<p>Hello ${this.name}</p></br>
     <a href=" ${this.url}">Confirm Email</a>`,`Welcome to the Platform`)
   }
   async sendPasswordReset(){
-    await this.send(`<p>Hello ${this.first_name}</p></br>
+    await this.send(`<p>Hello ${this.name}</p></br>
     Reset URL: ${this.url}`,`Your password Reset token (Valid for only 10 mins)`)
   }
 }

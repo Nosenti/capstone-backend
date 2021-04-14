@@ -11,6 +11,7 @@ router.get('/',(req,res)=>{
   res.status(200).send('Welcome to ALUxFeed')
 })
 router.post('/users/signup',authController.signup)
+router.get('/users/auth', checkAuth.verifyUser, authController.auth)
 router.post('/users/signin',authController.signin)
 /**
  * User routes

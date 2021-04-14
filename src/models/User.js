@@ -5,13 +5,9 @@ import crypto from 'crypto'
 
 const userSchema = mongoose.Schema(
   {
-    first_name: {
+    name: {
       type: String,
-      required: [true,'Please tell us your first name'],
-    },
-    last_name:{
-      type: String,
-      required: [true,'Please tell us your last name']
+      required: [true,'Please tell us your name'],
     },
     email: {
       type: String,

@@ -6,11 +6,23 @@ import Email from '../utils/email.js';
 
 export default class Auth {
 
+  static async auth(req,res){
+    try {
+      console.log(req.user);
+      const user = await User.findById(req.user.id).select('-password');
+      return res.status(200).send(user)
+    } catch (error) {
+      res.status(500).send({
+        status: 500,
+        message: 'server error'
+      })
+    }
+  }
+
   static async signup(req, res) {
     try {
       const {
-        first_name,
-        last_name,
+        name,
         email,
         password,
         passwordConfirm
@@ -37,8 +49,7 @@ export default class Auth {
       }
       const hash = hashPassword(password);
       const user = await User.create({
-        first_name,
-        last_name,
+        name,
         email,
         password:hash,
         role:'user'
@@ -156,9 +167,12 @@ export default class Auth {
         const token = jwtToken.createToken(user);
         return res.status(200).send({ token });
       }
-      return res.status(400).send({ status: 400, error: 'invalid email/password combination ' });
+      return res.status(400).send({ status: 400, message: 'invalid email/password combination ' });
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(500).send({
+        status: 500,
+        message: 'Server Error'
+      });
     }
   }
 
