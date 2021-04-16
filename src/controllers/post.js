@@ -37,15 +37,7 @@ class Post_ {
     try {
       const post = await Post.findById(req.params.id)
       if(post){
-        if(post.user.toString() === req.user.id){
-          return res.status(200).send(post);
-        }else{
-          return res.status(403).send({
-            status: 403,
-            message: 'unauthorized access'
-          })
-        }
-        
+        return res.status(200).send(post);
       }else{
         return res.status(404).send({
           message: 'Post not found'
@@ -163,7 +155,10 @@ class Post_ {
       
      
     } catch (error) {
-      res.status(500).send(error)
+      res.status(500).send({
+        status: 500,
+        message: 'Server error'
+      })
     }
   }
 

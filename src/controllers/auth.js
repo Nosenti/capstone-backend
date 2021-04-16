@@ -3,13 +3,14 @@ import User from '../models/User.js';
 import crypto from 'crypto';
 import { hashPassword, comparePassword, jwtToken, createPasswordResetToken } from '../utils/jwtToken.js';
 import Email from '../utils/email.js';
+import gravatar from 'gravatar';
 
 export default class Auth {
 
   static async auth(req,res){
     try {
-      console.log(req.user);
       const user = await User.findById(req.user.id).select('-password');
+      console.log(user)
       return res.status(200).send(user)
     } catch (error) {
       res.status(500).send({
@@ -40,6 +41,12 @@ export default class Auth {
           message: 'user already exists'
         });
       }
+
+      const avatar = gravatar.url(email, {
+        s: '200',
+        r:'pg',
+        d:'mm'
+      })
       
       if( passwordConfirm !== password){
         return res.status(400).send({
@@ -51,6 +58,7 @@ export default class Auth {
       const user = await User.create({
         name,
         email,
+        avatar,
         password:hash,
         role:'user'
       });
