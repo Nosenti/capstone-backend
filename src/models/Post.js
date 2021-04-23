@@ -19,7 +19,7 @@ const commentSchema = new Schema(
       avatar: {
         type: String
       },
-      tags:[String],
+      
       date: {
         type: Date,
         default: Date.now
@@ -44,6 +44,7 @@ const PostSchema = new Schema({
   avatar: {
     type: String
   },
+  tags:[String],
   numAgree:{
     type: Number
   },
