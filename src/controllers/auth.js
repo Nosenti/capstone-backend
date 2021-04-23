@@ -37,7 +37,7 @@ export default class Auth {
       // }
       const existUser = await User.findOne({ email });
       if (existUser) {
-        return res.status(409).json({
+        return res.status(409).send({
           message: 'user already exists'
         });
       }

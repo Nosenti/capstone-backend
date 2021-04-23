@@ -41,7 +41,8 @@ export default class Email{
   }
   async sendConfirmEmail(){
     await this.send(`<p>Hello ${this.name}</p></br>
-    <a href=" ${this.url}">Confirm Email</a>`,`Welcome to the Platform`)
+    <a href=" ${this.url}">Confirm Email</a><br>
+    <p>ALUxFeed</p>`,`Welcome to the ALUxFeed Platform`)
   }
   async sendPasswordReset(){
     await this.send(`<p>Hello ${this.name}</p></br>

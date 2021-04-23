@@ -11,7 +11,33 @@ class Post_ {
   async getPosts(req, res) {
     try {
       
-      const posts = await Post.find()
+      const posts = await Post.find({approved:true, declined:false}).sort({date: -1}).populate('user','-password').populate('post.user','-password')
+
+      if(! posts){
+        res.status(404).send({
+          status: 404,
+          message: ' No posts found'
+        })
+      }
+      
+      return res.status(200).send({
+        posts
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error);
+    }
+  }
+  /**
+   * @property {Function} getPending Getting all pending posts as moderator
+   * @returns {posts}
+   */
+  async getPending(req, res) {
+    try {
+      
+      const posts = await Post.find({approved:false, declined: false})
+
+      //  const posts = await Post.find({approved: false, declined: false}).sort({date: -1}).populate('user','-password').populate('post.user','-password')
 
       if(! posts){
         res.status(404).send({
@@ -35,7 +61,7 @@ class Post_ {
 
   async getOnePost(req,res){
     try {
-      const post = await Post.findById(req.params.id)
+      const post = await Post.findById(req.params.id).populate('user','-password')
       if(post){
         return res.status(200).send(post);
       }else{
@@ -60,24 +86,33 @@ class Post_ {
   async createPost(req, res) {
     try {
       let post;
-      const {title, text, postedAnonymously} = req.body;
+      const user = await User.findById(req.user.id).select('-password');
+      const {title, text, tags, postedAnonymously} = req.body;
+      console.log(req.body)
       if(postedAnonymously === true){
         post = await Post.create({
           user: req.user.id,
+          name: user.name,
           title,
+          tags,
           text,
+          avatar: user.avatar,
           postedAnonymously,
           approved: false
         })
       }else{
         post = await Post.create({
           user: req.user.id,
+          name: user.name,
           title,
+          tags,
           text,
+          avatar: user.avatar,
           postedAnonymously
         })
       }
-      
+      console.log('tags: ', post.tags);
+      console.log(post)
 
       return res.status(201).send({
         post,
@@ -165,14 +200,16 @@ class Post_ {
   async createComment(req,res){
     try {
       const {text} = req.body;
-
+      const user = await User.findById(req.user.id);
       const post = await Post.findById(req.params.id);
 
       if(post){
 
         const comment = {
-          name: req.user.name,
+          user: req.user.id,
+          name: user.name,
           text,
+          avatar: user.avatar,
           user: req.user.id
         }
 
@@ -292,6 +329,61 @@ class Post_ {
     }
   }
 
+  async approvePost(req,res){
+    try {
+      const post = await Post.findById(req.params.id);
+      if(!post){
+        return res.status(404).send({
+          status: 404,
+          message: 'post does not exist'
+        })
+      }
+
+      if(req.user.role === 'moderator'){
+        post.approved = true;
+        await post.save();
+        return res.status(200).send({
+          status: 200,
+          message:'Post approved'
+        })
+      }else{
+        return res.status(403).send({
+          status: 403,
+          message: 'User not authorized'
+        })
+      }
+    } catch (error) {
+      
+    }
+  }
+  async declinePost(req,res){
+    try {
+      const post = await Post.findById(req.params.id);
+      if(!post){
+        return res.status(404).send({
+          status: 404,
+          message: 'post does not exist'
+        })
+      }
+
+      if(req.user.role === 'moderator'){
+        post.declined = true;
+        await post.save();
+        return res.status(200).send({
+          status: 200,
+          message:'Post declined'
+        })
+      }else{
+        return res.status(403).send({
+          status: 403,
+          message: 'User not authorized'
+        })
+      }
+    } catch (error) {
+      
+    }
+  }
+
   async moderatePost(req,res){
     try {
       const post = await Post.findById(req.params.id);
@@ -325,7 +417,7 @@ class Post_ {
       
       
     } catch (error) {
-      return res.status(500).send({
+      return res.status(500).text().send({
         status: 500,
         message: 'Server error'
       })

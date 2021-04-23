@@ -19,6 +19,7 @@ const commentSchema = new Schema(
       avatar: {
         type: String
       },
+      tags:[String],
       date: {
         type: Date,
         default: Date.now
@@ -28,7 +29,10 @@ const commentSchema = new Schema(
 
 const PostSchema = new Schema({
   user: {
-    type: Schema.Types.ObjectId
+        type: Schema.Types.ObjectId, 
+  },
+  name: {
+    type: String
   },
   title: {
     type: String
