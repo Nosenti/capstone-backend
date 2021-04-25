@@ -8,6 +8,7 @@ import {userValidate} from '../validators/userValidate.js';
 import {postValidate} from '../validators/postValidator.js';
 import {commentValidate} from '../validators/commentValidate.js';
 import checkModerator from '../middleware/isModerator.js';
+import checkAdmin from '../middleware/isAdmin.js';
 
 const router = express.Router()
 router.use(express.json());
@@ -41,6 +42,12 @@ router.patch('/posts/:id/approvePost', checkAuth.verifyUser, postController.appr
 router.patch('/posts/:id/declinePost', checkAuth.verifyUser, postController.declinePost);
 router.get('/pendingPosts', checkAuth.verifyUser, checkModerator.verifyModerator, postController.getPending);
 
+/**
+ * Stats about the post
+ */
+router.get('/stats', checkAuth.verifyUser, checkAdmin.verifyAdmin, postController.getStats);
+router.get('/tagStats', checkAuth.verifyUser, checkAdmin.verifyAdmin, postController.getStatsTags);
+router.get('/postsDeclined', checkAuth.verifyUser, checkAdmin.verifyAdmin, postController.getStatsDeclined);
 /**
  * Comment routes
  */

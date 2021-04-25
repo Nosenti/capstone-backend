@@ -54,6 +54,85 @@ class Post_ {
       res.status(500).send(error);
     }
   }
+
+    /**
+   * @property {Function} getStats Getting all pending posts as moderator
+   * @returns {posts}
+   */
+  async getStats(req, res) {
+    try {
+      
+      const stats = await Post.aggregate([
+        
+        {
+          $group:{ 
+            _id:null , 
+            numPosts: {$sum:1},
+            averageAgree:{$avg:"$numAgree"} }
+        }
+      ])
+      
+      return res.status(200).send({
+        stats
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error);
+    }
+  }
+  async getStatsDeclined(req, res) {
+    try {
+      
+      const stats = await Post.aggregate([
+        {
+          $match:{
+            declined: true
+          }
+        },
+        {
+          $group:{ 
+            _id:null , 
+            numPosts: {$sum:1}
+          }
+        }
+      ])
+      
+      return res.status(200).send({
+        stats
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error);
+    }
+  }
+   /**
+   * @property {Function} getStats Getting all pending posts as moderator
+   * @returns {posts}
+   */
+  async getStatsTags(req, res) {
+    try {
+      
+      const stats = await Post.aggregate([
+        {
+          $unwind:"$tags"
+        },
+        
+        {
+          $group:{ 
+            _id:"$tags" , 
+            numPosts: {$sum:1},
+            averageAgree:{$avg:"$numAgree"} }
+        }
+      ])
+      
+      return res.status(200).send({
+        stats
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error);
+    }
+  }
   /**
    * @property {Function} getOnePost Getting one post item
    * @returns {post}

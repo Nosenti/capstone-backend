@@ -8,7 +8,7 @@ export default class Email{
     this.to = user.email;
     this.name = user.name;
     this.url = url;
-    this.from = `Innocent Ingabire <${process.env.EMAIL_FROM}>`
+    this.from = `ALUxFeed Support <${process.env.EMAIL_FROM}>`
   }
 
   newTransport(){

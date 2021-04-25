@@ -29,12 +29,12 @@ export default class Auth {
         passwordConfirm
       } = req.body;
 
-      // if (!((/@alustudent.com\s*$/.test(email))||(/@alueducation.com\s*$/.test(email)))) {
-      //   return res.status(400).send({
-      //     status: 400,
-      //     message: 'You should signup with ALU email'
-      //   })
-      // }
+      if (!((/@alustudent.com\s*$/.test(email))||(/@alueducation.com\s*$/.test(email)))) {
+        return res.status(400).send({
+          status: 400,
+          message: 'You should signup with ALU email'
+        })
+      }
       const existUser = await User.findOne({ email });
       if (existUser) {
         return res.status(409).send({
